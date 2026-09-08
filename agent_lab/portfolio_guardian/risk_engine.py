@@ -27,10 +27,15 @@ class RiskReport:
 
 
 def stress_test(positions: List[Position], shocks: Dict[str, float]) -> Dict[str, float]:
-    """Estimate portfolio loss under simple single-scenario price shocks."""
+    """Estimate portfolio loss under scenario-wide price shocks.
+
+    Each shock represents the return applied to the risky positions in that
+    scenario. Portfolio impact is the weighted sum of position returns.
+    """
+    invested_weight = sum(p.weight for p in positions if p.ticker != "CASH")
     return {
-        scenario: round(sum(p.weight * shocks.get(p.ticker, 0.0) for p in positions), 4)
-        for scenario in {"base", *shocks.keys()}
+        scenario: round(invested_weight * shock, 4)
+        for scenario, shock in {"base": 0.0, **shocks}.items()
     }
 
 
