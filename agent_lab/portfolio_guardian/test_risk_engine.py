@@ -1,3 +1,5 @@
+import pytest
+
 from risk_engine import Position, evaluate, stress_test
 
 
@@ -26,3 +28,18 @@ def test_stress_test_applies_scenario_shocks_to_invested_weight():
     assert losses["base"] == 0.0
     assert losses["market_selloff"] == -0.16
     assert losses["rates_shock"] == -0.08
+
+
+def test_position_rejects_invalid_weight():
+    with pytest.raises(ValueError, match="weight must be between 0 and 1"):
+        Position("A", 1.10, 0.20)
+
+
+def test_position_rejects_negative_volatility():
+    with pytest.raises(ValueError, match="volatility must be non-negative"):
+        Position("A", 0.20, -0.10)
+
+
+def test_base_scenario_cannot_be_overridden():
+    with pytest.raises(ValueError, match="'base' is reserved"):
+        stress_test([Position("A", 1.0, 0.20)], {"base": -0.50})
