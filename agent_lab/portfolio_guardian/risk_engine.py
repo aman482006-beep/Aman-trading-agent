@@ -10,6 +10,14 @@ class Position:
     weight: float
     volatility: float
 
+    def __post_init__(self) -> None:
+        if not self.ticker.strip():
+            raise ValueError("ticker must not be empty")
+        if not 0.0 <= self.weight <= 1.0:
+            raise ValueError("weight must be between 0 and 1 for long-only portfolios")
+        if self.volatility < 0.0:
+            raise ValueError("volatility must be non-negative")
+
 
 @dataclass(frozen=True)
 class RiskAlert:
@@ -32,6 +40,9 @@ def stress_test(positions: List[Position], shocks: Dict[str, float]) -> Dict[str
     Each shock represents the return applied to the risky positions in that
     scenario. Portfolio impact is the weighted sum of position returns.
     """
+    if "base" in shocks:
+        raise ValueError("'base' is reserved for the zero-shock baseline")
+
     invested_weight = sum(p.weight for p in positions if p.ticker != "CASH")
     return {
         scenario: round(invested_weight * shock, 4)
