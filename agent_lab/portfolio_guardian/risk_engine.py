@@ -51,6 +51,9 @@ def stress_test(positions: List[Position], shocks: Dict[str, float]) -> Dict[str
 
 
 def evaluate(positions: List[Position], max_single_name: float = 0.25) -> RiskReport:
+    if not 0.0 < max_single_name <= 1.0:
+        raise ValueError("max_single_name must be greater than 0 and at most 1")
+
     alerts: List[RiskAlert] = []
     score = 0.0
 
