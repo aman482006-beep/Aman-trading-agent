@@ -43,3 +43,11 @@ def test_position_rejects_negative_volatility():
 def test_base_scenario_cannot_be_overridden():
     with pytest.raises(ValueError, match="'base' is reserved"):
         stress_test([Position("A", 1.0, 0.20)], {"base": -0.50})
+
+
+def test_evaluate_rejects_invalid_concentration_threshold():
+    with pytest.raises(ValueError, match="max_single_name must be greater than 0"):
+        evaluate([Position("A", 0.50, 0.20)], max_single_name=0.0)
+
+    with pytest.raises(ValueError, match="max_single_name must be greater than 0"):
+        evaluate([Position("A", 0.50, 0.20)], max_single_name=1.10)
