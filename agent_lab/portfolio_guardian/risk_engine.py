@@ -65,6 +65,11 @@ def evaluate(positions: List[Position], max_single_name: float = 0.25) -> RiskRe
             alerts.append(RiskAlert("MEDIUM", "volatility", f"{p.ticker} volatility is {p.volatility:.0%}."))
             score += 15
 
+    total_weight = sum(p.weight for p in positions)
+    if total_weight > 1.0:
+        alerts.append(RiskAlert("HIGH", "exposure", f"Portfolio weights sum to {total_weight:.0%}."))
+        score += 30
+
     shocks = {
         "market_selloff": -0.20,
         "growth_shock": -0.30,
