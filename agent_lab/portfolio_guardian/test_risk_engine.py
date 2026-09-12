@@ -51,3 +51,13 @@ def test_evaluate_rejects_invalid_concentration_threshold():
 
     with pytest.raises(ValueError, match="max_single_name must be greater than 0"):
         evaluate([Position("A", 0.50, 0.20)], max_single_name=1.10)
+
+
+def test_evaluate_flags_excess_total_exposure():
+    report = evaluate([
+        Position("A", 0.70, 0.20),
+        Position("B", 0.50, 0.20),
+    ])
+
+    assert any(a.rule == "exposure" for a in report.alerts)
+    assert report.action == "ESCALATE"
