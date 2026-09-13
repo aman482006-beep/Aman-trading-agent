@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from math import isfinite
 from typing import Dict, List
 
 
@@ -42,6 +43,8 @@ def stress_test(positions: List[Position], shocks: Dict[str, float]) -> Dict[str
     """
     if "base" in shocks:
         raise ValueError("'base' is reserved for the zero-shock baseline")
+    if any(not isfinite(shock) for shock in shocks.values()):
+        raise ValueError("scenario shocks must be finite numbers")
 
     invested_weight = sum(p.weight for p in positions if p.ticker != "CASH")
     return {
