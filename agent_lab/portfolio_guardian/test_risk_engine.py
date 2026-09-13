@@ -1,3 +1,5 @@
+import math
+
 import pytest
 
 from risk_engine import Position, evaluate, stress_test
@@ -43,6 +45,14 @@ def test_position_rejects_negative_volatility():
 def test_base_scenario_cannot_be_overridden():
     with pytest.raises(ValueError, match="'base' is reserved"):
         stress_test([Position("A", 1.0, 0.20)], {"base": -0.50})
+
+
+def test_stress_test_rejects_non_finite_shocks():
+    positions = [Position("A", 1.0, 0.20)]
+
+    for shock in (math.nan, math.inf, -math.inf):
+        with pytest.raises(ValueError, match="scenario shocks must be finite"):
+            stress_test(positions, {"invalid": shock})
 
 
 def test_evaluate_rejects_invalid_concentration_threshold():
