@@ -33,13 +33,21 @@ def test_stress_test_applies_scenario_shocks_to_invested_weight():
 
 
 def test_position_rejects_invalid_weight():
-    with pytest.raises(ValueError, match="weight must be between 0 and 1"):
+    with pytest.raises(ValueError, match="weight must be"):
         Position("A", 1.10, 0.20)
 
 
 def test_position_rejects_negative_volatility():
-    with pytest.raises(ValueError, match="volatility must be non-negative"):
+    with pytest.raises(ValueError, match="volatility must be"):
         Position("A", 0.20, -0.10)
+
+
+def test_position_rejects_non_finite_inputs():
+    with pytest.raises(ValueError, match="weight must be"):
+        Position("A", math.nan, 0.20)
+
+    with pytest.raises(ValueError, match="volatility must be"):
+        Position("A", 0.20, math.inf)
 
 
 def test_base_scenario_cannot_be_overridden():
@@ -56,11 +64,14 @@ def test_stress_test_rejects_non_finite_shocks():
 
 
 def test_evaluate_rejects_invalid_concentration_threshold():
-    with pytest.raises(ValueError, match="max_single_name must be greater than 0"):
+    with pytest.raises(ValueError, match="max_single_name must be"):
         evaluate([Position("A", 0.50, 0.20)], max_single_name=0.0)
 
-    with pytest.raises(ValueError, match="max_single_name must be greater than 0"):
+    with pytest.raises(ValueError, match="max_single_name must be"):
         evaluate([Position("A", 0.50, 0.20)], max_single_name=1.10)
+
+    with pytest.raises(ValueError, match="max_single_name must be"):
+        evaluate([Position("A", 0.50, 0.20)], max_single_name=math.nan)
 
 
 def test_evaluate_flags_excess_total_exposure():
