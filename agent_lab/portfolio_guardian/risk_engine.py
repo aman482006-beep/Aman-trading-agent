@@ -14,10 +14,10 @@ class Position:
     def __post_init__(self) -> None:
         if not self.ticker.strip():
             raise ValueError("ticker must not be empty")
-        if not 0.0 <= self.weight <= 1.0:
-            raise ValueError("weight must be between 0 and 1 for long-only portfolios")
-        if self.volatility < 0.0:
-            raise ValueError("volatility must be non-negative")
+        if not isfinite(self.weight) or not 0.0 <= self.weight <= 1.0:
+            raise ValueError("weight must be a finite value between 0 and 1 for long-only portfolios")
+        if not isfinite(self.volatility) or self.volatility < 0.0:
+            raise ValueError("volatility must be a finite, non-negative value")
 
 
 @dataclass(frozen=True)
@@ -54,8 +54,8 @@ def stress_test(positions: List[Position], shocks: Dict[str, float]) -> Dict[str
 
 
 def evaluate(positions: List[Position], max_single_name: float = 0.25) -> RiskReport:
-    if not 0.0 < max_single_name <= 1.0:
-        raise ValueError("max_single_name must be greater than 0 and at most 1")
+    if not isfinite(max_single_name) or not 0.0 < max_single_name <= 1.0:
+        raise ValueError("max_single_name must be a finite value greater than 0 and at most 1")
 
     alerts: List[RiskAlert] = []
     score = 0.0
