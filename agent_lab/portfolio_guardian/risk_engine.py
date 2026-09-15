@@ -57,6 +57,10 @@ def evaluate(positions: List[Position], max_single_name: float = 0.25) -> RiskRe
     if not isfinite(max_single_name) or not 0.0 < max_single_name <= 1.0:
         raise ValueError("max_single_name must be a finite value greater than 0 and at most 1")
 
+    tickers = [p.ticker.strip().upper() for p in positions]
+    if len(tickers) != len(set(tickers)):
+        raise ValueError("positions must contain unique tickers")
+
     alerts: List[RiskAlert] = []
     score = 0.0
 
