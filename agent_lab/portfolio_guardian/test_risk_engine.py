@@ -82,3 +82,11 @@ def test_evaluate_flags_excess_total_exposure():
 
     assert any(a.rule == "exposure" for a in report.alerts)
     assert report.action == "ESCALATE"
+
+
+def test_evaluate_rejects_duplicate_tickers_case_insensitively():
+    with pytest.raises(ValueError, match="positions must contain unique tickers"):
+        evaluate([
+            Position("AAPL", 0.20, 0.20),
+            Position("aapl", 0.20, 0.20),
+        ])
