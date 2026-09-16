@@ -46,7 +46,7 @@ def stress_test(positions: List[Position], shocks: Dict[str, float]) -> Dict[str
     if any(not isfinite(shock) for shock in shocks.values()):
         raise ValueError("scenario shocks must be finite numbers")
 
-    invested_weight = sum(p.weight for p in positions if p.ticker != "CASH")
+    invested_weight = sum(p.weight for p in positions if p.ticker.strip().upper() != "CASH")
     return {
         scenario: round(invested_weight * shock, 4)
         for scenario, shock in {"base": 0.0, **shocks}.items()
