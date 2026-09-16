@@ -32,6 +32,13 @@ def test_stress_test_applies_scenario_shocks_to_invested_weight():
     assert losses["rates_shock"] == -0.08
 
 
+def test_stress_test_excludes_cash_case_insensitively():
+    positions = [Position("A", 0.60, 0.20), Position("cash", 0.40, 0.0)]
+    losses = stress_test(positions, {"market_selloff": -0.20})
+
+    assert losses["market_selloff"] == -0.12
+
+
 def test_position_rejects_invalid_weight():
     with pytest.raises(ValueError, match="weight must be"):
         Position("A", 1.10, 0.20)
