@@ -41,6 +41,8 @@ def stress_test(positions: List[Position], shocks: Dict[str, float]) -> Dict[str
     Each shock represents the return applied to the risky positions in that
     scenario. Portfolio impact is the weighted sum of position returns.
     """
+    if not positions:
+        raise ValueError("positions must contain at least one position")
     if "base" in shocks:
         raise ValueError("'base' is reserved for the zero-shock baseline")
     if any(not isfinite(shock) for shock in shocks.values()):
@@ -54,6 +56,8 @@ def stress_test(positions: List[Position], shocks: Dict[str, float]) -> Dict[str
 
 
 def evaluate(positions: List[Position], max_single_name: float = 0.25) -> RiskReport:
+    if not positions:
+        raise ValueError("positions must contain at least one position")
     if not isfinite(max_single_name) or not 0.0 < max_single_name <= 1.0:
         raise ValueError("max_single_name must be a finite value greater than 0 and at most 1")
 
