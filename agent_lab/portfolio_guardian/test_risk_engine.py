@@ -97,3 +97,11 @@ def test_evaluate_rejects_duplicate_tickers_case_insensitively():
             Position("AAPL", 0.20, 0.20),
             Position("aapl", 0.20, 0.20),
         ])
+
+
+def test_empty_portfolio_is_rejected():
+    with pytest.raises(ValueError, match="positions must contain at least one position"):
+        evaluate([])
+
+    with pytest.raises(ValueError, match="positions must contain at least one position"):
+        stress_test([], {"market_selloff": -0.20})
