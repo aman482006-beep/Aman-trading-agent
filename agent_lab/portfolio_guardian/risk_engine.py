@@ -45,6 +45,8 @@ def stress_test(positions: List[Position], shocks: Dict[str, float]) -> Dict[str
         raise ValueError("positions must contain at least one position")
     if "base" in shocks:
         raise ValueError("'base' is reserved for the zero-shock baseline")
+    if any(not isinstance(scenario, str) or not scenario.strip() for scenario in shocks):
+        raise ValueError("scenario names must be non-empty strings")
     if any(not isfinite(shock) for shock in shocks.values()):
         raise ValueError("scenario shocks must be finite numbers")
 
