@@ -70,6 +70,14 @@ def test_stress_test_rejects_non_finite_shocks():
             stress_test(positions, {"invalid": shock})
 
 
+def test_stress_test_rejects_empty_scenario_names():
+    positions = [Position("A", 1.0, 0.20)]
+
+    for scenario in ("", "   "):
+        with pytest.raises(ValueError, match="scenario names must be"):
+            stress_test(positions, {scenario: -0.20})
+
+
 def test_evaluate_rejects_invalid_concentration_threshold():
     with pytest.raises(ValueError, match="max_single_name must be"):
         evaluate([Position("A", 0.50, 0.20)], max_single_name=0.0)
