@@ -57,9 +57,12 @@ def test_position_rejects_non_finite_inputs():
         Position("A", 0.20, math.inf)
 
 
-def test_base_scenario_cannot_be_overridden():
-    with pytest.raises(ValueError, match="'base' is reserved"):
-        stress_test([Position("A", 1.0, 0.20)], {"base": -0.50})
+def test_base_scenario_cannot_be_overridden_case_insensitively():
+    positions = [Position("A", 1.0, 0.20)]
+
+    for scenario in ("base", "BASE", " Base "):
+        with pytest.raises(ValueError, match="'base' is reserved"):
+            stress_test(positions, {scenario: -0.50})
 
 
 def test_stress_test_rejects_non_finite_shocks():
