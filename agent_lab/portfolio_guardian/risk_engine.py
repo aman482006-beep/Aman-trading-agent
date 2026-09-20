@@ -12,8 +12,8 @@ class Position:
     volatility: float
 
     def __post_init__(self) -> None:
-        if not self.ticker.strip():
-            raise ValueError("ticker must not be empty")
+        if not isinstance(self.ticker, str) or not self.ticker.strip():
+            raise ValueError("ticker must be a non-empty string")
         if not isfinite(self.weight) or not 0.0 <= self.weight <= 1.0:
             raise ValueError("weight must be a finite value between 0 and 1 for long-only portfolios")
         if not isfinite(self.volatility) or self.volatility < 0.0:
