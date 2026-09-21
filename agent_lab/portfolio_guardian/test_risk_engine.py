@@ -95,6 +95,26 @@ def test_evaluate_rejects_duplicate_tickers_case_insensitively():
         evaluate([Position("AAPL", 0.20, 0.20), Position("aapl", 0.20, 0.20)])
 
 
+def test_evaluate_flags_high_weighted_portfolio_volatility():
+    report = evaluate([
+        Position("A", 0.40, 0.40),
+        Position("B", 0.40, 0.35),
+        Position("CASH", 0.20, 0.0),
+    ])
+    alert = next(a for a in report.alerts if a.rule == "portfolio_volatility")
+    assert alert.severity == "MEDIUM"
+    assert "38%" in alert.message
+    assert report.action == "ESCALATE"
+
+
+def test_cash_does_not_distort_weighted_portfolio_volatility():
+    report = evaluate([
+        Position("A", 0.40, 0.40),
+        Position("CASH", 0.60, 0.0),
+    ])
+    assert not any(a.rule == "portfolio_volatility" for a in report.alerts)
+
+
 def test_empty_portfolio_is_rejected():
     with pytest.raises(ValueError, match="positions must contain at least one position"):
         evaluate([])
