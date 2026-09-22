@@ -71,6 +71,13 @@ def test_stress_test_rejects_non_finite_shocks():
             stress_test(positions, {"invalid": shock})
 
 
+def test_stress_test_rejects_non_numeric_shocks():
+    positions = [Position("A", 1.0, 0.20)]
+    for shock in ("-0.20", None, True):
+        with pytest.raises(ValueError, match="scenario shocks must be finite"):
+            stress_test(positions, {"invalid": shock})
+
+
 def test_stress_test_rejects_empty_scenario_names():
     positions = [Position("A", 1.0, 0.20)]
     for scenario in ("", "   "):
