@@ -47,7 +47,7 @@ def stress_test(positions: List[Position], shocks: Dict[str, float]) -> Dict[str
         raise ValueError("'base' is reserved for the zero-shock baseline")
     if any(not isinstance(scenario, str) or not scenario.strip() for scenario in shocks):
         raise ValueError("scenario names must be non-empty strings")
-    if any(not isfinite(shock) for shock in shocks.values()):
+    if any(isinstance(shock, bool) or not isinstance(shock, (int, float)) or not isfinite(shock) for shock in shocks.values()):
         raise ValueError("scenario shocks must be finite numbers")
 
     invested_weight = sum(p.weight for p in positions if p.ticker.strip().upper() != "CASH")
