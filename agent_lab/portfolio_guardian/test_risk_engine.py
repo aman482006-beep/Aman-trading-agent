@@ -122,6 +122,14 @@ def test_cash_does_not_distort_weighted_portfolio_volatility():
     assert not any(a.rule == "portfolio_volatility" for a in report.alerts)
 
 
+def test_evaluate_flags_severe_worst_case_stress_loss():
+    report = evaluate([Position("A", 1.0, 0.20)])
+    alert = next(a for a in report.alerts if a.rule == "stress_loss")
+    assert alert.severity == "HIGH"
+    assert "30%" in alert.message
+    assert "growth_shock" in alert.message
+
+
 def test_empty_portfolio_is_rejected():
     with pytest.raises(ValueError, match="positions must contain at least one position"):
         evaluate([])
