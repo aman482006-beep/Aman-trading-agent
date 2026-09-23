@@ -106,7 +106,16 @@ def evaluate(positions: List[Position], max_single_name: float = 0.25) -> RiskRe
         "rates_shock": -0.15,
     }
     stress_losses = stress_test(positions, shocks)
-    score += min(40, abs(min(stress_losses.values())) * 100)
+    worst_scenario, worst_loss = min(stress_losses.items(), key=lambda item: item[1])
+    if worst_loss < -0.25:
+        alerts.append(
+            RiskAlert(
+                "HIGH",
+                "stress_loss",
+                f"Worst stress scenario ({worst_scenario}) implies a {abs(worst_loss):.0%} portfolio loss.",
+            )
+        )
+    score += min(40, abs(worst_loss) * 100)
     score = round(min(score, 100), 1)
 
     action = "ESCALATE" if score >= 60 else "REVIEW" if score >= 30 else "PASS"
