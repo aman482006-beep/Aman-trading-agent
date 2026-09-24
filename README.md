@@ -22,6 +22,15 @@ It uses typed state, an evidence ledger, confidence scores, explicit veto rules,
 ### 🛡️ Portfolio Guardian
 A deterministic risk agent that evaluates concentration and volatility, runs portfolio stress scenarios, and produces structured `PASS / REVIEW / ESCALATE` decisions.
 
+The Portfolio Guardian currently:
+
+- Rejects invalid, non-finite, empty, or duplicate portfolio inputs.
+- Flags single-name concentration and excessive total exposure.
+- Calculates invested-portfolio weighted volatility while excluding cash from the volatility denominator.
+- Runs deterministic `market_selloff`, `growth_shock`, and `rates_shock` scenarios.
+- Reports the worst stress scenario and raises a `HIGH`-severity alert when the implied portfolio loss exceeds 25%.
+- Keeps stress-test inputs deterministic and rejects invalid scenario names or shock values.
+
 No LLM or API key is required to run the risk engine, making its behaviour reproducible and testable.
 
 ## Why this repository exists
