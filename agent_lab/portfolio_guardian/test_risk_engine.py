@@ -50,6 +50,17 @@ def test_position_rejects_non_finite_inputs():
     with pytest.raises(ValueError, match="volatility must be"):
         Position("A", 0.20, math.inf)
 
+def test_position_rejects_non_numeric_and_boolean_weight():
+    for weight in ("0.20", None, True):
+        with pytest.raises(ValueError, match="weight must be"):
+            Position("A", weight, 0.20)
+
+
+def test_position_rejects_non_numeric_and_boolean_volatility():
+    for volatility in ("0.20", None, True):
+        with pytest.raises(ValueError, match="volatility must be"):
+            Position("A", 0.20, volatility)
+
 
 def test_position_rejects_non_string_or_empty_ticker():
     for ticker in (123, "   "):
@@ -86,7 +97,7 @@ def test_stress_test_rejects_empty_scenario_names():
 
 
 def test_evaluate_rejects_invalid_concentration_threshold():
-    for threshold in (0.0, 1.10, math.nan):
+    for threshold in (0.0, 1.10, math.nan, "0.25", None, True):
         with pytest.raises(ValueError, match="max_single_name must be"):
             evaluate([Position("A", 0.50, 0.20)], max_single_name=threshold)
 
