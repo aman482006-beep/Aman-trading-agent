@@ -135,3 +135,20 @@ def test_empty_portfolio_is_rejected():
         evaluate([])
     with pytest.raises(ValueError, match="positions must contain at least one position"):
         stress_test([], {"market_selloff": -0.20})
+
+
+def test_position_rejects_string_weight_with_value_error():
+    with pytest.raises(ValueError, match="weight must be"):
+        Position("A", "0.20", 0.20)
+
+
+def test_position_rejects_string_volatility_with_value_error():
+    with pytest.raises(ValueError, match="volatility must be"):
+        Position("A", 0.20, "0.20")
+
+
+def test_position_rejects_boolean_weight_and_volatility():
+    with pytest.raises(ValueError, match="weight must be"):
+        Position("A", True, 0.20)
+    with pytest.raises(ValueError, match="volatility must be"):
+        Position("A", 0.20, True)

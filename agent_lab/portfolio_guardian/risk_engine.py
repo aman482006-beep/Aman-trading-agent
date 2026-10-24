@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from math import isfinite
+from numbers import Real
 from typing import Dict, List
 
 
@@ -14,9 +15,19 @@ class Position:
     def __post_init__(self) -> None:
         if not isinstance(self.ticker, str) or not self.ticker.strip():
             raise ValueError("ticker must be a non-empty string")
-        if not isfinite(self.weight) or not 0.0 <= self.weight <= 1.0:
+        if (
+            isinstance(self.weight, bool)
+            or not isinstance(self.weight, Real)
+            or not isfinite(self.weight)
+            or not 0.0 <= self.weight <= 1.0
+        ):
             raise ValueError("weight must be a finite value between 0 and 1 for long-only portfolios")
-        if not isfinite(self.volatility) or self.volatility < 0.0:
+        if (
+            isinstance(self.volatility, bool)
+            or not isinstance(self.volatility, Real)
+            or not isfinite(self.volatility)
+            or self.volatility < 0.0
+        ):
             raise ValueError("volatility must be a finite, non-negative value")
 
 
