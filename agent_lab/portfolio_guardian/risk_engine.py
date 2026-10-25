@@ -86,7 +86,8 @@ def evaluate(positions: List[Position], max_single_name: float = 0.25) -> RiskRe
     score = 0.0
 
     for p in positions:
-        if p.weight > max_single_name:
+        # Cash is not a single-name security concentration.
+        if p.ticker.strip().upper() != "CASH" and p.weight > max_single_name:
             alerts.append(RiskAlert("HIGH", "concentration", f"{p.ticker} is {p.weight:.0%} of the portfolio."))
             score += 30
         if p.volatility > 0.50:
