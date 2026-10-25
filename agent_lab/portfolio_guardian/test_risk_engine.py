@@ -11,6 +11,12 @@ def test_concentration_triggers_escalation():
     assert report.action in {"REVIEW", "ESCALATE"}
 
 
+def test_cash_weight_does_not_trigger_single_name_concentration():
+    report = evaluate([Position("A", 0.20, 0.20), Position(" cash ", 0.80, 0.0)])
+    assert not any(a.rule == "concentration" for a in report.alerts)
+    assert report.action == "PASS"
+
+
 def test_diversified_low_volatility_can_pass():
     report = evaluate([
         Position("A", 0.20, 0.20), Position("B", 0.20, 0.20),
@@ -125,12 +131,14 @@ def test_evaluate_flags_high_weighted_portfolio_volatility():
     assert report.action == "ESCALATE"
 
 
-def test_cash_does_not_distort_weighted_portfolio_volatility():
+def test_cash_does_not_dilute_invested_position_volatility():
     report = evaluate([
         Position("A", 0.40, 0.40),
         Position("CASH", 0.60, 0.0),
     ])
-    assert not any(a.rule == "portfolio_volatility" for a in report.alerts)
+    alert = next(a for a in report.alerts if a.rule == "portfolio_volatility")
+    assert alert.severity == "MEDIUM"
+    assert "40%" in alert.message
 
 
 def test_evaluate_flags_severe_worst_case_stress_loss():
