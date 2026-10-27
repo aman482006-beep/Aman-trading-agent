@@ -88,6 +88,18 @@ def test_stress_test_rejects_non_finite_shocks():
             stress_test(positions, {"invalid": shock})
 
 
+def test_stress_test_rejects_losses_beyond_total_investment():
+    positions = [Position("A", 1.0, 0.20)]
+    for shock in (-1.01, -1.5):
+        with pytest.raises(ValueError, match="cannot be less than -100%"):
+            stress_test(positions, {"impossible_crash": shock})
+
+
+def test_stress_test_accepts_total_loss_boundary():
+    positions = [Position("A", 1.0, 0.20)]
+    assert stress_test(positions, {"total_loss": -1.0})["total_loss"] == -1.0
+
+
 def test_stress_test_rejects_non_numeric_shocks():
     positions = [Position("A", 1.0, 0.20)]
     for shock in ("-0.20", None, True):
