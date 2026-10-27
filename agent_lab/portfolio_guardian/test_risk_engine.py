@@ -56,6 +56,7 @@ def test_position_rejects_non_finite_inputs():
     with pytest.raises(ValueError, match="volatility must be"):
         Position("A", 0.20, math.inf)
 
+
 def test_position_rejects_non_numeric_and_boolean_weight():
     for weight in ("0.20", None, True):
         with pytest.raises(ValueError, match="weight must be"):
@@ -166,3 +167,21 @@ def test_empty_portfolio_is_rejected():
         evaluate([])
     with pytest.raises(ValueError, match="positions must contain at least one position"):
         stress_test([], {"market_selloff": -0.20})
+
+
+def test_position_rejects_oversized_integer_weight_and_volatility():
+    huge = 10 ** 1000
+    with pytest.raises(ValueError, match="weight must be"):
+        Position("A", huge, 0.20)
+    with pytest.raises(ValueError, match="volatility must be"):
+        Position("A", 0.20, huge)
+
+
+def test_stress_test_rejects_oversized_integer_shock():
+    with pytest.raises(ValueError, match="scenario shocks must be finite"):
+        stress_test([Position("A", 1.0, 0.20)], {"oversized": 10 ** 1000})
+
+
+def test_evaluate_rejects_oversized_integer_concentration_threshold():
+    with pytest.raises(ValueError, match="max_single_name must be"):
+        evaluate([Position("A", 0.50, 0.20)], max_single_name=10 ** 1000)

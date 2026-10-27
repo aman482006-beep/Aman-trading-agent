@@ -5,6 +5,18 @@ from math import isfinite
 from typing import Dict, List
 
 
+def _is_finite_number(value: object) -> bool:
+    """Return whether a non-boolean int/float is finite without leaking overflow."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return False
+    try:
+        return isfinite(value)
+    except OverflowError:
+        # math.isfinite converts large Python integers to float; that conversion
+        # can overflow even though the integer itself is valid Python data.
+        return False
+
+
 @dataclass(frozen=True)
 class Position:
     ticker: str
@@ -14,19 +26,9 @@ class Position:
     def __post_init__(self) -> None:
         if not isinstance(self.ticker, str) or not self.ticker.strip():
             raise ValueError("ticker must be a non-empty string")
-        if (
-            isinstance(self.weight, bool)
-            or not isinstance(self.weight, (int, float))
-            or not isfinite(self.weight)
-            or not 0.0 <= self.weight <= 1.0
-        ):
+        if not _is_finite_number(self.weight) or not 0.0 <= self.weight <= 1.0:
             raise ValueError("weight must be a finite value between 0 and 1 for long-only portfolios")
-        if (
-            isinstance(self.volatility, bool)
-            or not isinstance(self.volatility, (int, float))
-            or not isfinite(self.volatility)
-            or self.volatility < 0.0
-        ):
+        if not _is_finite_number(self.volatility) or self.volatility < 0.0:
             raise ValueError("volatility must be a finite, non-negative value")
 
 
@@ -57,7 +59,7 @@ def stress_test(positions: List[Position], shocks: Dict[str, float]) -> Dict[str
         raise ValueError("'base' is reserved for the zero-shock baseline")
     if any(not isinstance(scenario, str) or not scenario.strip() for scenario in shocks):
         raise ValueError("scenario names must be non-empty strings")
-    if any(isinstance(shock, bool) or not isinstance(shock, (int, float)) or not isfinite(shock) for shock in shocks.values()):
+    if any(not _is_finite_number(shock) for shock in shocks.values()):
         raise ValueError("scenario shocks must be finite numbers")
     # For long-only positions, a price-return shock cannot be below -100%.
     if any(shock < -1.0 for shock in shocks.values()):
@@ -73,12 +75,7 @@ def stress_test(positions: List[Position], shocks: Dict[str, float]) -> Dict[str
 def evaluate(positions: List[Position], max_single_name: float = 0.25) -> RiskReport:
     if not positions:
         raise ValueError("positions must contain at least one position")
-    if (
-        isinstance(max_single_name, bool)
-        or not isinstance(max_single_name, (int, float))
-        or not isfinite(max_single_name)
-        or not 0.0 < max_single_name <= 1.0
-    ):
+    if not _is_finite_number(max_single_name) or not 0.0 < max_single_name <= 1.0:
         raise ValueError("max_single_name must be a finite value greater than 0 and at most 1")
 
     tickers = [p.ticker.strip().upper() for p in positions]
