@@ -59,6 +59,9 @@ def stress_test(positions: List[Position], shocks: Dict[str, float]) -> Dict[str
         raise ValueError("scenario names must be non-empty strings")
     if any(isinstance(shock, bool) or not isinstance(shock, (int, float)) or not isfinite(shock) for shock in shocks.values()):
         raise ValueError("scenario shocks must be finite numbers")
+    # For long-only positions, a price-return shock cannot be below -100%.
+    if any(shock < -1.0 for shock in shocks.values()):
+        raise ValueError("scenario shocks cannot be less than -100% for long-only positions")
 
     invested_weight = sum(p.weight for p in positions if p.ticker.strip().upper() != "CASH")
     return {
