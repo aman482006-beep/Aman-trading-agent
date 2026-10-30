@@ -90,7 +90,9 @@ def evaluate(positions: List[Position], max_single_name: float = 0.25) -> RiskRe
         if p.ticker.strip().upper() != "CASH" and p.weight > max_single_name:
             alerts.append(RiskAlert("HIGH", "concentration", f"{p.ticker} is {p.weight:.0%} of the portfolio."))
             score += 30
-        if p.volatility > 0.50:
+        # Cash is excluded from portfolio volatility calculations, so it must
+        # also be excluded from the per-position volatility alert.
+        if p.ticker.strip().upper() != "CASH" and p.volatility > 0.50:
             alerts.append(RiskAlert("MEDIUM", "volatility", f"{p.ticker} volatility is {p.volatility:.0%}."))
             score += 15
 
