@@ -185,3 +185,9 @@ def test_stress_test_rejects_oversized_integer_shock():
 def test_evaluate_rejects_oversized_integer_concentration_threshold():
     with pytest.raises(ValueError, match="max_single_name must be"):
         evaluate([Position("A", 0.50, 0.20)], max_single_name=10 ** 1000)
+
+
+def test_cash_does_not_trigger_individual_volatility_alert():
+    report = evaluate([Position("A", 0.20, 0.20), Position("CASH", 0.80, 0.90)])
+    assert not any(a.rule == "volatility" for a in report.alerts)
+    assert not any(a.rule == "portfolio_volatility" for a in report.alerts)
