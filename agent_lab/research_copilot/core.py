@@ -6,11 +6,12 @@ from typing import Any, Callable, Dict, List, Protocol
 
 
 def _is_finite_number(value: object) -> bool:
-    return (
-        not isinstance(value, bool)
-        and isinstance(value, (int, float))
-        and isfinite(value)
-    )
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return False
+    try:
+        return isfinite(value)
+    except OverflowError:
+        return False
 
 
 @dataclass(frozen=True)
