@@ -14,6 +14,15 @@ def _tokens(text: str) -> set[str]:
     }
 
 
+def _is_finite_number(value: object) -> bool:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return False
+    try:
+        return isfinite(value)
+    except OverflowError:
+        return False
+
+
 @dataclass(frozen=True)
 class Chunk:
     id: str
@@ -39,12 +48,7 @@ class Claim:
             not isinstance(item, str) or not item.strip() for item in self.evidence_ids
         ):
             raise ValueError("evidence_ids must be a list of non-empty strings")
-        if (
-            isinstance(self.confidence, bool)
-            or not isinstance(self.confidence, (int, float))
-            or not isfinite(self.confidence)
-            or not 0.0 <= self.confidence <= 1.0
-        ):
+        if not _is_finite_number(self.confidence) or not 0.0 <= self.confidence <= 1.0:
             raise ValueError("confidence must be a finite value between 0 and 1")
 
 
