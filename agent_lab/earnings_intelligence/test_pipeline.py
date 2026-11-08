@@ -71,3 +71,8 @@ def test_build_claim_rejects_invalid_inputs():
         build_claim("A claim.", "not evidence")
     with pytest.raises(ValueError, match="confidence"):
         Claim("claim", [], 1.5)
+
+
+def test_claim_rejects_oversized_integer_confidence():
+    with pytest.raises(ValueError, match="confidence"):
+        Claim("claim", [], 10 ** 1000)
