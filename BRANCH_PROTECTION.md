@@ -21,7 +21,7 @@ Enable:
 - **Require status checks to pass before merging**, and select the CI job named **Python 3.11 · tests, lint and build** after it has appeared on a pull request.
 - **Block force pushes** and **block branch deletion** for main.
 
-Do not configure an approval requirement that cannot be satisfied. If the repository has only one maintainer, first add a trusted independent reviewer or maintainer; GitHub does not allow the PR author to approve their own pull request.
+Do not configure an approval requirement that cannot be satisfied. If the repository has only one maintainer, first add a trusted independent reviewer or maintainer with repository access; GitHub does not allow the PR author to approve their own pull request. If the only entry in CODEOWNERS is the PR author, add the second maintainer as a code owner before enabling “Require review from Code Owners”, otherwise the rule may be impossible to satisfy for maintainer-authored pull requests.
 
 ## What this repository already provides
 
