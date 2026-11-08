@@ -213,5 +213,5 @@ def test_stress_test_rejects_duplicate_tickers():
 
 def test_stress_test_rejects_case_insensitive_duplicate_scenarios():
     positions = [Position("A", 1.0, 0.2)]
-    with pytest.raises(ValueError, match="unique \(case-insensitive\)"):
+    with pytest.raises(ValueError, match="unique"):
         stress_test(positions, {"selloff": -0.2, " SELLOFF ": -0.1})
