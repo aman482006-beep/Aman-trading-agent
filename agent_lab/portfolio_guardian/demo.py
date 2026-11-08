@@ -1,7 +1,7 @@
-from risk_engine import Position, evaluate
+from agent_lab.portfolio_guardian.risk_engine import Position, evaluate
 
 
-if __name__ == "__main__":
+def main() -> None:
     portfolio = [
         Position("NVDA", 0.32, 0.58),
         Position("MSFT", 0.20, 0.31),
@@ -18,3 +18,7 @@ if __name__ == "__main__":
     print("\nAlerts:")
     for alert in report.alerts:
         print(f"  [{alert.severity}] {alert.rule}: {alert.message}")
+
+
+if __name__ == "__main__":
+    main()

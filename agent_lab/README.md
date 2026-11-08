@@ -1,31 +1,47 @@
 # Agentic Finance Lab
 
-An original research layer built around a finance-agent workflow. The goal is not to make an LLM *sound* like an analyst; it is to make agent behaviour inspectable, bounded, and testable.
+Original research experiments exploring inspectable, bounded and testable finance workflows.
 
-## What this demonstrates
-
-- **Planner → specialists → skeptic → risk gate → synthesis** orchestration
-- Typed state passed between agents instead of hidden prompt chains
-- Evidence ledger with source, confidence, and claim ownership
-- Explicit risk vetoes and escalation rules
-- Run traces that make every agent decision auditable
-- Deterministic portfolio stress testing without requiring an LLM or API key
-- Pluggable model/tool interfaces: the orchestration layer does not depend on one provider
+This directory contains small prototypes maintained separately from the upstream TradingAgents framework in the repository's tradingagents/ and cli/ directories.
 
 ## Projects
 
-### 1. Research Copilot
-`agent_lab/research_copilot/`
+### 1. Portfolio Guardian
 
-A multi-agent equity research workflow. The planner decomposes a question, specialist agents analyse fundamentals and market context, a skeptic attacks the thesis, and a risk gate decides whether the final synthesis is allowed to pass.
+Path: agent_lab/portfolio_guardian/
 
-### 2. Portfolio Guardian
-`agent_lab/portfolio_guardian/`
+A deterministic portfolio-risk rules engine. It validates position inputs, checks single-name concentration and weighted volatility, detects excess exposure, applies fixed scenario shocks and produces a score plus PASS / REVIEW / ESCALATE outcome.
 
-A deterministic risk agent for concentration, drawdown, volatility and scenario shocks. It produces structured alerts and escalation decisions before a portfolio action can proceed.
+It does not fetch security prices, calculate realised volatility, model correlations or drawdowns, estimate liquidity, or place trades. Its score and thresholds are transparent heuristics, not calibrated risk measures.
 
-## Design principle
+### 2. Research Copilot
 
-> **Agents should produce decisions with provenance, not just prose.**
+Path: agent_lab/research_copilot/
 
-This lab is for research and engineering experimentation. It is not investment advice and does not place trades.
+A deterministic orchestration prototype. Fixed specialist functions populate typed state, an illustrative evidence ledger and a run trace. A rule-based gate applies simple leverage, free-cash-flow and confidence thresholds.
+
+The current version does not call an LLM, retrieve live company data or independently verify evidence. The evidence sources and confidence values in the demo are illustrative placeholders and must not be interpreted as sourced research.
+
+### 3. Earnings Intelligence
+
+Path: agent_lab/earnings_intelligence/
+
+A lexical retrieval baseline. It scores supplied chunks by keyword overlap and returns evidence IDs that a claim can reference.
+
+The current version does not ingest earnings transcripts, use embeddings, rank semantic relevance or generate claims using an LLM. The confidence value is a simple evidence-count heuristic, not a calibrated probability.
+
+## Run demos from the repository root
+
+~~~bash
+python main.py portfolio
+python main.py research
+python main.py earnings
+~~~
+
+## Tests
+
+~~~bash
+python -m pytest -q agent_lab
+~~~
+
+The top-level test suite also covers the retained upstream TradingAgents framework. See the root README and CONTRIBUTING.md for setup and complete checks.

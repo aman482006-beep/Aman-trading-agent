@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <meta name="description" content="An inspectable finance-agent research lab: deterministic portfolio risk checks, auditable research workflows, and transparent earnings-document retrieval experiments.">
+  <title>Agentic Finance Research Lab</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --panel: #111c2e;
+      --panel-2: #152238;
+      --line: #293a53;
+      --text: #edf3fb;
+      --muted: #a7b5c8;
+      --accent: #73d2c5;
+      --accent-2: #9cc9ff;
+      --good: #7fdbab;
+      --warn: #f5ce78;
+      --bad: #ff918d;
+      --radius: 18px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: radial-gradient(ellipse at 80% -10%, #1b3650 0, transparent 42%), var(--bg); color: var(--text); line-height: 1.55; }
+    a { color: var(--accent-2); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { width: min(1120px, calc(100% - 40px)); margin: 0 auto; }
+    header { border-bottom: 1px solid rgba(180,205,235,.12); }
+    nav { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 72px; }
+    .brand { display: flex; gap: 12px; align-items: center; font-weight: 700; letter-spacing: -.02em; color: var(--text); }
+    .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid #4d8f91; border-radius: 11px; color: var(--accent); background: rgba(115,210,197,.08); font-size: 17px; }
+    .nav-links { display: flex; flex-wrap: wrap; gap: 22px; font-size: 13px; color: var(--muted); }
+    .hero { padding: 82px 0 56px; max-width: 880px; }
+    .eyebrow { color: var(--accent); font-size: 12px; text-transform: uppercase; letter-spacing: .16em; font-weight: 800; }
+    h1 { margin: 17px 0 18px; font-size: clamp(38px, 6vw, 64px); line-height: 1.04; letter-spacing: -.055em; max-width: 820px; }
+    .lead { color: #c0cddd; font-size: clamp(17px, 2vw, 20px); max-width: 760px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 43px; border: 1px solid #3c526e; padding: 0 16px; border-radius: 10px; font-weight: 700; font-size: 14px; color: var(--text); background: rgba(255,255,255,.025); }
+    .button.primary { background: var(--accent); color: #08201e; border-color: var(--accent); }
+    .button:hover { text-decoration: none; filter: brightness(1.06); }
+    .meta-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:30px; }
+    .pill { border:1px solid var(--line); padding:6px 10px; border-radius:99px; color:var(--muted); font-size:12px; }
+    section { padding: 42px 0; }
+    .section-head { display:flex; justify-content:space-between; align-items:end; gap:20px; margin-bottom:20px; }
+    h2 { margin:0; font-size:clamp(25px,3vw,34px); letter-spacing:-.035em; }
+    .section-head p { margin:0; max-width:520px; color:var(--muted); }
+    .grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+    .card { background:linear-gradient(160deg, rgba(21,34,56,.96), rgba(15,26,44,.96)); border:1px solid var(--line); border-radius:var(--radius); padding:22px; }
+    .card h3 { margin:9px 0 8px; font-size:18px; letter-spacing:-.02em; }
+    .card p { color:var(--muted); margin:0; font-size:14px; }
+    .icon { width:38px; height:38px; display:grid; place-items:center; border:1px solid #3b5f6b; color:var(--accent); background:rgba(115,210,197,.07); border-radius:12px; font-weight:800; }
+    .tag { display:inline-block; margin-top:16px; font-size:11px; color:var(--accent); letter-spacing:.08em; text-transform:uppercase; font-weight:800; }
+    .demo-shell { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(290px,.9fr); gap:16px; align-items:start; }
+    .demo-card { background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:22px; }
+    .demo-card h3 { margin:0 0 8px; font-size:19px; }
+    .subtle { color:var(--muted); font-size:13px; }
+    .table-wrap { overflow-x:auto; margin-top:16px; }
+    table { width:100%; border-collapse:collapse; min-width:440px; }
+    th { text-align:left; font-size:11px; color:#9cadc2; text-transform:uppercase; letter-spacing:.07em; padding:10px 8px; border-bottom:1px solid var(--line); }
+    td { padding:8px; border-bottom:1px solid rgba(41,58,83,.7); }
+    input { width:100%; background:#0b1423; color:var(--text); border:1px solid #34465e; border-radius:8px; min-height:36px; padding:7px 9px; font:inherit; font-size:13px; }
+    input:focus { outline:2px solid rgba(115,210,197,.35); border-color:var(--accent); }
+    .ticker { min-width:95px; }
+    .number { min-width:88px; }
+    .table-actions { display:flex; gap:9px; flex-wrap:wrap; margin-top:15px; }
+    .small-button { background:#1b2b43; border:1px solid #3b526d; color:var(--text); border-radius:9px; padding:8px 11px; font-weight:700; cursor:pointer; }
+    .small-button.primary { background:var(--accent); color:#07201d; border-color:var(--accent); }
+    .small-button:focus-visible { outline:2px solid white; outline-offset:2px; }
+    .output { min-height:245px; background:#0b1423; border:1px solid var(--line); border-radius:13px; padding:17px; }
+    .result-top { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .score { font-size:42px; letter-spacing:-.06em; font-weight:800; }
+    .status { border-radius:99px; padding:5px 10px; font-size:11px; font-weight:800; letter-spacing:.08em; }
+    .status.pass { background:rgba(127,219,171,.13); color:var(--good); }
+    .status.review { background:rgba(245,206,120,.13); color:var(--warn); }
+    .status.escalate { background:rgba(255,145,141,.13); color:var(--bad); }
+    .metrics { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin:15px 0; }
+    .metric { background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:11px; }
+    .metric strong { display:block; font-size:18px; }
+    .metric span { color:var(--muted); font-size:11px; }
+    .alerts { display:grid; gap:8px; margin-top:12px; }
+    .alert { padding:10px 11px; border-radius:9px; border:1px solid var(--line); font-size:12px; color:#cfdae8; }
+    .alert.high { border-left:3px solid var(--bad); }
+    .alert.medium { border-left:3px solid var(--warn); }
+    .alert.info { border-left:3px solid var(--accent-2); }
+    .note { padding:15px 17px; background:rgba(156,201,255,.06); border:1px solid rgba(156,201,255,.22); border-radius:12px; color:#c3d6ed; font-size:13px; }
+    .steps { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:9px; margin-top:19px; }
+    .step { padding:13px; background:var(--panel); border:1px solid var(--line); border-radius:12px; min-height:105px; }
+    .step b { color:var(--accent); display:block; font-size:11px; margin-bottom:7px; }
+    .step span { font-size:13px; color:#d9e3ef; }
+    .provenance { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .provenance .card { padding:20px; }
+    .provenance ul { padding-left:18px; color:var(--muted); font-size:13px; margin-bottom:0; }
+    footer { border-top:1px solid var(--line); padding:28px 0 42px; color:var(--muted); font-size:12px; }
+    .footer-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; }
+    @media (max-width:800px) {
+      .grid { grid-template-columns:1fr; }
+      .demo-shell { grid-template-columns:1fr; }
+      .steps { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .provenance { grid-template-columns:1fr; }
+      .section-head { align-items:start; flex-direction:column; }
+    }
+    @media (max-width:520px) {
+      .wrap { width:min(100% - 26px,1120px); }
+      nav { align-items:start; flex-direction:column; justify-content:center; padding:14px 0; gap:10px; }
+      .nav-links { gap:14px; }
+      .hero { padding:55px 0 40px; }
+      section { padding:32px 0; }
+      .steps { grid-template-columns:1fr; }
+      .demo-card { padding:16px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <nav aria-label="Main navigation">
+        <a class="brand" href="#top"><span class="brand-mark">AF</span><span>Agentic Finance Lab</span></a>
+        <div class="nav-links">
+          <a href="#systems">Systems</a>
+          <a href="#playground">Risk playground</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#source">Source</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+  <main id="top">
+    <div class="wrap">
+      <section class="hero">
+        <div class="eyebrow">Finance × AI × Engineering</div>
+        <h1>Make financial-agent decisions inspectable.</h1>
+        <p class="lead">An engineering lab exploring evidence-aware research workflows, deterministic portfolio-risk checks, and transparent extraction of claims from financial documents.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#playground">Try the risk playground ↓</a>
+          <a class="button" href="https://github.com/aman482006-beep/Aman-trading-agent">View source on GitHub ↗</a>
+        </div>
+        <div class="meta-row">
+          <span class="pill">Open source · Apache-2.0</span>
+          <span class="pill">Python research prototypes</span>
+          <span class="pill">No broker execution</span>
+          <span class="pill">No live data in this preview</span>
+        </div>
+      </section>
+
+      <section id="systems">
+        <div class="section-head">
+          <div><div class="eyebrow">The lab</div><h2>Three small systems. Clear boundaries.</h2></div>
+          <p>The original research layer is deliberately separated from the vendored upstream TradingAgents framework. Each prototype is documented according to what it actually does today.</p>
+        </div>
+        <div class="grid">
+          <article class="card">
+            <div class="icon">01</div>
+            <h3>Portfolio Guardian</h3>
+            <p>A deterministic rules engine for position validation, concentration alerts, weighted-volatility checks and named stress scenarios. It does not use an LLM.</p>
+            <span class="tag">Implemented · Python</span>
+          </article>
+          <article class="card">
+            <div class="icon">02</div>
+            <h3>Research Copilot</h3>
+            <p>A deterministic orchestration prototype showing typed state, specialist steps, an illustrative evidence ledger, a skeptic stage and a rule-based veto gate.</p>
+            <span class="tag">Prototype · Synthetic inputs</span>
+          </article>
+          <article class="card">
+            <div class="icon">03</div>
+            <h3>Earnings Intelligence</h3>
+            <p>A transparent keyword-overlap retrieval baseline that returns source chunks and attaches evidence IDs to a claim. It is not an embedding search system.</p>
+            <span class="tag">Prototype · Local text only</span>
+          </article>
+        </div>
+      </section>
+
+      <section id="playground">
+        <div class="section-head">
+          <div><div class="eyebrow">Interactive preview</div><h2>Portfolio Guardian playground</h2></div>
+          <p>Change weights and volatility inputs, then run the same deterministic rules described in the Python implementation.</p>
+        </div>
+        <div class="demo-shell">
+          <div class="demo-card">
+            <h3>Portfolio inputs</h3>
+            <p class="subtle">Weights are percentages of portfolio value. Volatility is a user-supplied decimal converted from percent; its time basis is not inferred.</p>
+            <div class="table-wrap">
+              <table aria-label="Portfolio positions">
+                <thead><tr><th scope="col">Ticker</th><th scope="col">Weight %</th><th scope="col">Volatility %</th><th scope="col"></th></tr></thead>
+                <tbody id="positions">
+                  <tr><td><input class="ticker" aria-label="Ticker" value="NVDA"></td><td><input class="number weight" aria-label="Weight percent" type="number" min="0" max="100" step="1" value="32"></td><td><input class="number volatility" aria-label="Volatility percent" type="number" min="0" step="1" value="58"></td><td><button class="small-button remove" type="button" aria-label="Remove NVDA">×</button></td></tr>
+                  <tr><td><input class="ticker" aria-label="Ticker" value="MSFT"></td><td><input class="number weight" aria-label="Weight percent" type="number" min="0" max="100" step="1" value="20"></td><td><input class="number volatility" aria-label="Volatility percent" type="number" min="0" step="1" value="31"></td><td><button class="small-button remove" type="button" aria-label="Remove MSFT">×</button></td></tr>
+                  <tr><td><input class="ticker" aria-label="Ticker" value="JPM"></td><td><input class="number weight" aria-label="Weight percent" type="number" min="0" max="100" step="1" value="18"></td><td><input class="number volatility" aria-label="Volatility percent" type="number" min="0" step="1" value="27"></td><td><button class="small-button remove" type="button" aria-label="Remove JPM">×</button></td></tr>
+                  <tr><td><input class="ticker" aria-label="Ticker" value="CASH"></td><td><input class="number weight" aria-label="Weight percent" type="number" min="0" max="100" step="1" value="30"></td><td><input class="number volatility" aria-label="Volatility percent" type="number" min="0" step="1" value="0"></td><td><button class="small-button remove" type="button" aria-label="Remove CASH">×</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-actions">
+              <button class="small-button" id="add-position" type="button">＋ Add position</button>
+              <button class="small-button" id="reset" type="button">Reset example</button>
+              <button class="small-button primary" id="evaluate" type="button">Evaluate portfolio</button>
+            </div>
+            <p class="subtle" id="input-error" role="alert" aria-live="polite"></p>
+          </div>
+          <div class="demo-card">
+            <h3>Risk report</h3>
+            <p class="subtle">Illustrative rule output from the current inputs.</p>
+            <div class="output" id="result" aria-live="polite">
+              <div class="result-top"><div><div class="subtle">Risk score</div><div class="score">—</div></div><span class="status review">READY</span></div>
+              <p class="subtle">Run the portfolio check to calculate the score, alerts and scenario losses.</p>
+            </div>
+          </div>
+        </div>
+        <div class="note" style="margin-top:14px">
+          <strong>Important:</strong> This browser playground is a transparent demonstration of the rules engine. Inputs are not fetched from market providers, stress shocks are fixed scenarios, volatility is not estimated from returns, and the output is not an investment recommendation. See <a href="agent_lab/portfolio_guardian/SCENARIO_PLAYBOOK.md">the scenario playbook</a> for assumptions and limitations.
+        </div>
+      </section>
+
+      <section id="architecture">
+        <div class="section-head">
+          <div><div class="eyebrow">Research workflow</div><h2>Inspectable by design.</h2></div>
+          <p>The goal is to make each stage and evidence boundary visible—not to present a demo as autonomous investment intelligence.</p>
+        </div>
+        <div class="steps">
+          <div class="step"><b>01 · PLAN</b><span>Decompose the research question.</span></div>
+          <div class="step"><b>02 · ANALYSE</b><span>Summarise supplied fundamentals and market context.</span></div>
+          <div class="step"><b>03 · CHALLENGE</b><span>Run a fixed skeptic step against the thesis.</span></div>
+          <div class="step"><b>04 · GATE</b><span>Apply explicit deterministic veto rules.</span></div>
+          <div class="step"><b>05 · TRACE</b><span>Show outputs, evidence IDs and decisions.</span></div>
+        </div>
+      </section>
+
+      <section id="source">
+        <div class="section-head">
+          <div><div class="eyebrow">Code and provenance</div><h2>Clear ownership boundaries.</h2></div>
+          <p>This repository contains original experiments and separately attributed upstream software. The boundary matters.</p>
+        </div>
+        <div class="provenance">
+          <article class="card">
+            <div class="eyebrow">Original work</div>
+            <h3><code>agent_lab/</code></h3>
+            <ul>
+              <li>Portfolio Guardian deterministic risk engine.</li>
+              <li>Research Copilot orchestration prototype.</li>
+              <li>Earnings Intelligence retrieval baseline.</li>
+              <li>Tests, demos and documentation for these components.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <div class="eyebrow">Upstream component</div>
+            <h3><code>tradingagents/</code> and <code>cli/</code></h3>
+            <ul>
+              <li>Contains adapted/retained TradingAgents framework code.</li>
+              <li>Original project: <a href="https://github.com/TauricResearch/TradingAgents">Tauric Research / TradingAgents</a>.</li>
+              <li>Not presented as original authorship or upstream maintenance.</li>
+              <li>See <a href="UPSTREAM.md">upstream provenance and attribution</a>.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer>
+    <div class="wrap footer-row">
+      <span>Agentic Finance Research Lab · Apache-2.0</span>
+      <span><a href="https://github.com/aman482006-beep/Aman-trading-agent">Source</a> · <a href="CONTRIBUTING.md">Contributing</a> · <a href="SECURITY.md">Security</a></span>
+    </div>
+  </footer>
+  <script>
+    const tbody = document.getElementById("positions");
+    const errorNode = document.getElementById("input-error");
+    const resultNode = document.getElementById("result");
+
+    function addRow(ticker = "", weight = 0, volatility = 0) {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td><input class="ticker" aria-label="Ticker" maxlength="16" value=""></td>
+        <td><input class="number weight" aria-label="Weight percent" type="number" min="0" max="100" step="0.1"></td>
+        <td><input class="number volatility" aria-label="Volatility percent" type="number" min="0" step="0.1"></td>
+        <td><button class="small-button remove" type="button" aria-label="Remove position">×</button></td>`;
+      row.querySelector(".ticker").value = ticker;
+      row.querySelector(".weight").value = weight;
+      row.querySelector(".volatility").value = volatility;
+      tbody.appendChild(row);
+    }
+
+    function readPositions() {
+      const rows = [...tbody.querySelectorAll("tr")];
+      if (!rows.length) throw new Error("Add at least one position.");
+      const positions = rows.map((row, index) => {
+        const ticker = row.querySelector(".ticker").value.trim().toUpperCase();
+        const weightText = row.querySelector(".weight").value;
+        const volText = row.querySelector(".volatility").value;
+        if (!ticker) throw new Error(`Row ${index + 1}: ticker is required.`);
+        if (weightText === "" || volText === "") throw new Error(`Row ${index + 1}: weight and volatility are required.`);
+        const weightPct = Number(weightText);
+        const volatilityPct = Number(volText);
+        if (!Number.isFinite(weightPct) || weightPct < 0 || weightPct > 100) throw new Error(`Row ${index + 1}: weight must be between 0% and 100%.`);
+        if (!Number.isFinite(volatilityPct) || volatilityPct < 0) throw new Error(`Row ${index + 1}: volatility must be a finite non-negative number.`);
+        return { ticker, weight: weightPct / 100, volatility: volatilityPct / 100 };
+      });
+      const tickers = positions.map(position => position.ticker);
+      if (new Set(tickers).size !== tickers.length) throw new Error("Ticker names must be unique (case-insensitive).");
+      return positions;
+    }
+
+    function evaluatePortfolio(positions) {
+      if (!positions.length) throw new Error("Positions must contain at least one position.");
+      const alerts = [];
+      let score = 0;
+      for (const p of positions) {
+        if (p.weight > 0.25 && p.ticker !== "CASH") {
+          alerts.push({ severity: "HIGH", rule: "concentration", message: `${p.ticker} is ${(p.weight * 100).toFixed(0)}% of the portfolio.` });
+          score += 30;
+        }
+        if (p.volatility > 0.50 && p.ticker !== "CASH") {
+          alerts.push({ severity: "MEDIUM", rule: "volatility", message: `${p.ticker} volatility is ${(p.volatility * 100).toFixed(0)}%.` });
+          score += 15;
+        }
+      }
+      const totalWeight = positions.reduce((sum, p) => sum + p.weight, 0);
+      if (totalWeight > 1.0) {
+        alerts.push({ severity: "HIGH", rule: "exposure", message: `Portfolio weights sum to ${(totalWeight * 100).toFixed(0)}%.` });
+        score += 30;
+      }
+      const riskyWeight = positions.filter(p => p.ticker !== "CASH").reduce((sum, p) => sum + p.weight, 0);
+      const weightedVolatility = riskyWeight > 0
+        ? positions.filter(p => p.ticker !== "CASH").reduce((sum, p) => sum + p.weight * p.volatility, 0) / riskyWeight
+        : 0;
+      if (weightedVolatility > 0.30) {
+        alerts.push({ severity: "MEDIUM", rule: "portfolio_volatility", message: `Weighted portfolio volatility is ${(weightedVolatility * 100).toFixed(0)}%.` });
+        score += 20;
+      }
+      const stressLosses = {
+        base: 0,
+        market_selloff: Number((riskyWeight * -0.20).toFixed(4)),
+        growth_shock: Number((riskyWeight * -0.30).toFixed(4)),
+        rates_shock: Number((riskyWeight * -0.15).toFixed(4))
+      };
+      const worst = Object.entries(stressLosses).sort((a, b) => a[1] - b[1])[0];
+      if (worst[1] < -0.25) {
+        alerts.push({ severity: "HIGH", rule: "stress_loss", message: `Worst stress scenario (${worst[0]}) implies a ${Math.abs(worst[1] * 100).toFixed(0)}% portfolio loss.` });
+      }
+      score += Math.min(40, Math.abs(worst[1]) * 100);
+      score = Math.min(100, Math.round(score * 10) / 10);
+      return { score, alerts, stressLosses, weightedVolatility, totalWeight, action: score >= 60 ? "ESCALATE" : score >= 30 ? "REVIEW" : "PASS" };
+    }
+
+    function escapeHtml(value) {
+      const entities = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+      return String(value).replace(/[&<>"']/g, character => entities[character]);
+    }
+
+    function renderReport(report) {
+      const actionClass = report.action.toLowerCase();
+      const losses = Object.entries(report.stressLosses).map(([name, loss]) =>
+        `<div class="metric"><strong>${(loss * 100).toFixed(1)}%</strong><span>${name.replaceAll("_", " ")}</span></div>`
+      ).join("");
+      const alerts = report.alerts.length
+        ? report.alerts.map(a => `<div class="alert ${a.severity.toLowerCase()}"><strong>[${a.severity}] ${a.rule.replaceAll("_", " ")}</strong><br>${escapeHtml(a.message)}</div>`).join("")
+        : '<div class="alert info">No rule alerts were triggered for these inputs.</div>';
+      resultNode.innerHTML = `
+        <div class="result-top"><div><div class="subtle">Risk score</div><div class="score">${report.score}<span class="subtle"> / 100</span></div></div><span class="status ${actionClass}">${report.action}</span></div>
+        <div class="metrics">
+          <div class="metric"><strong>${(report.totalWeight * 100).toFixed(1)}%</strong><span>Total entered weight</span></div>
+          <div class="metric"><strong>${(report.weightedVolatility * 100).toFixed(1)}%</strong><span>Weighted volatility</span></div>
+        </div>
+        <div class="subtle">Scenario impact</div><div class="metrics">${losses}</div>
+        <div class="subtle">Rule alerts</div><div class="alerts">${alerts}</div>`;
+    }
+
+    tbody.addEventListener("click", event => {
+      const button = event.target.closest(".remove");
+      if (button) button.closest("tr").remove();
+    });
+    document.getElementById("add-position").addEventListener("click", () => addRow());
+    document.getElementById("reset").addEventListener("click", () => {
+      tbody.innerHTML = "";
+      addRow("NVDA", 32, 58); addRow("MSFT", 20, 31); addRow("JPM", 18, 27); addRow("CASH", 30, 0);
+      errorNode.textContent = "";
+      resultNode.innerHTML = '<div class="subtle">Example restored. Run the check to refresh the report.</div>';
+    });
+    document.getElementById("evaluate").addEventListener("click", () => {
+      try {
+        const report = evaluatePortfolio(readPositions());
+        errorNode.textContent = "";
+        renderReport(report);
+      } catch (error) {
+        errorNode.textContent = error instanceof Error ? error.message : "Unable to evaluate these inputs.";
+      }
+    });
+    document.getElementById("evaluate").click();
+  </script>
+</body>
+</html>

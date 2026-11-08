@@ -2,7 +2,7 @@ import math
 
 import pytest
 
-from risk_engine import Position, evaluate, stress_test
+from agent_lab.portfolio_guardian.risk_engine import Position, evaluate, stress_test
 
 
 def test_concentration_triggers_escalation():
@@ -191,3 +191,27 @@ def test_cash_does_not_trigger_individual_volatility_alert():
     report = evaluate([Position("A", 0.20, 0.20), Position("CASH", 0.80, 0.90)])
     assert not any(a.rule == "volatility" for a in report.alerts)
     assert not any(a.rule == "portfolio_volatility" for a in report.alerts)
+
+
+def test_stress_test_rejects_non_mapping_shocks():
+    with pytest.raises(ValueError, match="shocks must be a mapping"):
+        stress_test([Position("A", 1.0, 0.2)], None)
+
+
+def test_stress_test_rejects_non_position_records():
+    with pytest.raises(ValueError, match="only Position records"):
+        stress_test([{"ticker": "A"}], {"market_selloff": -0.2})
+
+
+def test_stress_test_rejects_duplicate_tickers():
+    with pytest.raises(ValueError, match="unique tickers"):
+        stress_test(
+            [Position("AAPL", 0.5, 0.2), Position("aapl", 0.5, 0.2)],
+            {"market_selloff": -0.2},
+        )
+
+
+def test_stress_test_rejects_case_insensitive_duplicate_scenarios():
+    positions = [Position("A", 1.0, 0.2)]
+    with pytest.raises(ValueError, match="unique"):
+        stress_test(positions, {"selloff": -0.2, " SELLOFF ": -0.1})

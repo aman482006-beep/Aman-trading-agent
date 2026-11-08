@@ -1,43 +1,31 @@
-from tradingagents.graph.trading_graph import TradingAgentsGraph
-from tradingagents.default_config import DEFAULT_CONFIG
-from dotenv import load_dotenv
+"""Run one of the repository's deterministic agent_lab demonstrations."""
+from __future__ import annotations
 
-# Load environment variables
-load_dotenv()
+import argparse
+import runpy
 
-# Create config
-config = DEFAULT_CONFIG.copy()
 
-# 🔥 FORCE OLLAMA (ALL POSSIBLE KEYS — no ambiguity)
-config.update({
-    "llm_provider": "ollama",
-    
-    # Model names
-    "deep_think_llm": "mistral",
-    "quick_think_llm": "mistral",
-    "deep_thinking_llm": "mistral",
-    "quick_thinking_llm": "mistral",
-    
-    # Backend
-    "backend_url": "http://localhost:11434/v1",
-
-    # Disable any OpenAI reasoning settings (just in case)
-    "openai_reasoning_effort": None,
-})
-
-# 🔥 Force data source (no API needed)
-config["data_vendors"] = {
-    "core_stock_apis": "yfinance",
-    "technical_indicators": "yfinance",
-    "fundamental_data": "yfinance",
-    "news_data": "yfinance",
+DEMO_MODULES = {
+    "portfolio": "agent_lab.portfolio_guardian.demo",
+    "research": "agent_lab.research_copilot.demo",
+    "earnings": "agent_lab.earnings_intelligence.demo",
 }
 
-# Initialize system
-ta = TradingAgentsGraph(debug=True, config=config)
 
-# Run analysis
-_, decision = ta.propagate("NVDA", "2024-05-10")
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Run a deterministic Agentic Finance Research Lab demonstration."
+    )
+    parser.add_argument(
+        "demo",
+        nargs="?",
+        choices=tuple(DEMO_MODULES),
+        default="portfolio",
+        help="Demonstration to run (default: portfolio).",
+    )
+    args = parser.parse_args()
+    runpy.run_module(DEMO_MODULES[args.demo], run_name="__main__")
 
-print("\nFINAL DECISION:\n")
-print(decision)
+
+if __name__ == "__main__":
+    main()

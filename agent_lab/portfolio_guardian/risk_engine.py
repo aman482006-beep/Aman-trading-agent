@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from math import isfinite
 from typing import Dict, List
@@ -47,64 +48,109 @@ class RiskReport:
     action: str
 
 
+def _validate_positions(positions: object) -> List[Position]:
+    """Validate a sequence of unique Position records before any calculation."""
+    if not isinstance(positions, Sequence) or isinstance(positions, (str, bytes)):
+        raise ValueError("positions must be a sequence of Position records")
+    if not positions:
+        raise ValueError("positions must contain at least one position")
+    if any(not isinstance(position, Position) for position in positions):
+        raise ValueError("positions must contain only Position records")
+
+    validated = list(positions)
+    tickers = [position.ticker.strip().upper() for position in validated]
+    if len(tickers) != len(set(tickers)):
+        raise ValueError("positions must contain unique tickers")
+    return validated
+
+
 def stress_test(positions: List[Position], shocks: Dict[str, float]) -> Dict[str, float]:
     """Estimate portfolio loss under scenario-wide price shocks.
 
     Each shock represents the return applied to the risky positions in that
     scenario. Portfolio impact is the weighted sum of position returns.
     """
-    if not positions:
-        raise ValueError("positions must contain at least one position")
-    if any(isinstance(scenario, str) and scenario.strip().lower() == "base" for scenario in shocks):
-        raise ValueError("'base' is reserved for the zero-shock baseline")
-    if any(not isinstance(scenario, str) or not scenario.strip() for scenario in shocks):
-        raise ValueError("scenario names must be non-empty strings")
-    if any(not _is_finite_number(shock) for shock in shocks.values()):
-        raise ValueError("scenario shocks must be finite numbers")
-    # For long-only positions, a price-return shock cannot be below -100%.
-    if any(shock < -1.0 for shock in shocks.values()):
-        raise ValueError("scenario shocks cannot be less than -100% for long-only positions")
+    validated_positions = _validate_positions(positions)
+    if not isinstance(shocks, Mapping):
+        raise ValueError("shocks must be a mapping of scenario names to numeric returns")
 
-    invested_weight = sum(p.weight for p in positions if p.ticker.strip().upper() != "CASH")
+    normalized_shocks: Dict[str, float] = {}
+    seen_scenarios = set()
+    for scenario, shock in shocks.items():
+        if not isinstance(scenario, str) or not scenario.strip():
+            raise ValueError("scenario names must be non-empty strings")
+        clean_name = scenario.strip()
+        normalized_name = clean_name.casefold()
+        if normalized_name == "base":
+            raise ValueError("'base' is reserved for the zero-shock baseline")
+        if normalized_name in seen_scenarios:
+            raise ValueError("scenario names must be unique (case-insensitive)")
+        seen_scenarios.add(normalized_name)
+        if not _is_finite_number(shock):
+            raise ValueError("scenario shocks must be finite numbers")
+        # For long-only positions, a price-return shock cannot be below -100%.
+        if shock < -1.0:
+            raise ValueError("scenario shocks cannot be less than -100% for long-only positions")
+        normalized_shocks[clean_name] = float(shock)
+
+    invested_weight = sum(
+        position.weight
+        for position in validated_positions
+        if position.ticker.strip().upper() != "CASH"
+    )
+    scenarios = {"base": 0.0, **normalized_shocks}
     return {
         scenario: round(invested_weight * shock, 4)
-        for scenario, shock in {"base": 0.0, **shocks}.items()
+        for scenario, shock in scenarios.items()
     }
 
 
 def evaluate(positions: List[Position], max_single_name: float = 0.25) -> RiskReport:
-    if not positions:
-        raise ValueError("positions must contain at least one position")
+    validated_positions = _validate_positions(positions)
     if not _is_finite_number(max_single_name) or not 0.0 < max_single_name <= 1.0:
         raise ValueError("max_single_name must be a finite value greater than 0 and at most 1")
-
-    tickers = [p.ticker.strip().upper() for p in positions]
-    if len(tickers) != len(set(tickers)):
-        raise ValueError("positions must contain unique tickers")
 
     alerts: List[RiskAlert] = []
     score = 0.0
 
-    for p in positions:
+    for position in validated_positions:
+        ticker = position.ticker.strip().upper()
         # Cash is not a single-name security concentration.
-        if p.ticker.strip().upper() != "CASH" and p.weight > max_single_name:
-            alerts.append(RiskAlert("HIGH", "concentration", f"{p.ticker} is {p.weight:.0%} of the portfolio."))
+        if ticker != "CASH" and position.weight > max_single_name:
+            alerts.append(
+                RiskAlert(
+                    "HIGH",
+                    "concentration",
+                    f"{position.ticker} is {position.weight:.0%} of the portfolio.",
+                )
+            )
             score += 30
         # Cash is excluded from portfolio volatility calculations, so it must
         # also be excluded from the per-position volatility alert.
-        if p.ticker.strip().upper() != "CASH" and p.volatility > 0.50:
-            alerts.append(RiskAlert("MEDIUM", "volatility", f"{p.ticker} volatility is {p.volatility:.0%}."))
+        if ticker != "CASH" and position.volatility > 0.50:
+            alerts.append(
+                RiskAlert(
+                    "MEDIUM",
+                    "volatility",
+                    f"{position.ticker} volatility is {position.volatility:.0%}.",
+                )
+            )
             score += 15
 
-    total_weight = sum(p.weight for p in positions)
+    total_weight = sum(position.weight for position in validated_positions)
     if total_weight > 1.0:
-        alerts.append(RiskAlert("HIGH", "exposure", f"Portfolio weights sum to {total_weight:.0%}."))
+        alerts.append(
+            RiskAlert("HIGH", "exposure", f"Portfolio weights sum to {total_weight:.0%}.")
+        )
         score += 30
 
-    risky_weight = sum(p.weight for p in positions if p.ticker.strip().upper() != "CASH")
+    risky_positions = [
+        position for position in validated_positions
+        if position.ticker.strip().upper() != "CASH"
+    ]
+    risky_weight = sum(position.weight for position in risky_positions)
     weighted_volatility = (
-        sum(p.weight * p.volatility for p in positions if p.ticker.strip().upper() != "CASH")
-        / risky_weight
+        sum(position.weight * position.volatility for position in risky_positions) / risky_weight
         if risky_weight > 0
         else 0.0
     )
@@ -123,7 +169,7 @@ def evaluate(positions: List[Position], max_single_name: float = 0.25) -> RiskRe
         "growth_shock": -0.30,
         "rates_shock": -0.15,
     }
-    stress_losses = stress_test(positions, shocks)
+    stress_losses = stress_test(validated_positions, shocks)
     worst_scenario, worst_loss = min(stress_losses.items(), key=lambda item: item[1])
     if worst_loss < -0.25:
         alerts.append(
