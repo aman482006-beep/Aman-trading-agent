@@ -35,10 +35,13 @@ jobs:
           python -m pip install -e ".[dev,demo]"
 
       - name: Check maintained code
-        run: ruff check agent_lab app.py main.py
+        run: ruff check agent_lab app.py main.py scripts/check_preview.py
 
       - name: Compile maintained code
-        run: python -m compileall -q agent_lab app.py main.py
+        run: python -m compileall -q agent_lab app.py main.py scripts/check_preview.py
+
+      - name: Validate GitHub Pages preview JavaScript
+        run: python scripts/check_preview.py
 
       - name: Run complete test suite
         run: python -m pytest -q --cov=agent_lab --cov-report=term-missing
