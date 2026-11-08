@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "tradingagents"
 version = "0.2.4"
-description = "TradingAgents: Multi-Agents LLM Financial Trading Framework"
+description = "TradingAgents framework with an Agentic Finance Research Lab"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -32,17 +32,28 @@ dependencies = [
     "yfinance>=0.2.63",
 ]
 
+[project.optional-dependencies]
+demo = [
+    "streamlit>=1.40.0",
+]
+dev = [
+    "build>=1.2.2",
+    "pytest>=8.3.0",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.8.0",
+]
+
 [project.scripts]
 tradingagents = "cli.main:app"
 
 [tool.setuptools.packages.find]
-include = ["tradingagents*", "cli*"]
+include = ["tradingagents*", "cli*", "agent_lab*"]
 
 [tool.setuptools.package-data]
 cli = ["static/*"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "agent_lab"]
 addopts = "-ra --strict-markers"
 markers = [
     "unit: fast isolated unit tests",
@@ -52,3 +63,10 @@ markers = [
 filterwarnings = [
     "ignore::DeprecationWarning",
 ]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
