@@ -49,7 +49,7 @@ def main() -> None:
 
     with tempfile.TemporaryDirectory() as directory:
         script_path = Path(directory) / "preview.js"
-        script_path.write_text("\\n".join(parser.scripts), encoding="utf-8")
+        script_path.write_text("\n".join(parser.scripts), encoding="utf-8")
         subprocess.run([node, "--check", str(script_path)], check=True)
 
     print(f"Validated {len(parser.scripts)} inline script block(s) in index.html.")
