@@ -331,9 +331,9 @@
       }
       const stressLosses = {
         base: 0,
-        market_selloff: riskyWeight * -0.20,
-        growth_shock: riskyWeight * -0.30,
-        rates_shock: riskyWeight * -0.15
+        market_selloff: Number((riskyWeight * -0.20).toFixed(4)),
+        growth_shock: Number((riskyWeight * -0.30).toFixed(4)),
+        rates_shock: Number((riskyWeight * -0.15).toFixed(4))
       };
       const worst = Object.entries(stressLosses).sort((a, b) => a[1] - b[1])[0];
       if (worst[1] < -0.25) {
@@ -344,13 +344,18 @@
       return { score, alerts, stressLosses, weightedVolatility, totalWeight, action: score >= 60 ? "ESCALATE" : score >= 30 ? "REVIEW" : "PASS" };
     }
 
+    function escapeHtml(value) {
+      const entities = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+      return String(value).replace(/[&<>"']/g, character => entities[character]);
+    }
+
     function renderReport(report) {
       const actionClass = report.action.toLowerCase();
       const losses = Object.entries(report.stressLosses).map(([name, loss]) =>
         `<div class="metric"><strong>${(loss * 100).toFixed(1)}%</strong><span>${name.replaceAll("_", " ")}</span></div>`
       ).join("");
       const alerts = report.alerts.length
-        ? report.alerts.map(a => `<div class="alert ${a.severity.toLowerCase()}"><strong>[${a.severity}] ${a.rule.replaceAll("_", " ")}</strong><br>${a.message}</div>`).join("")
+        ? report.alerts.map(a => `<div class="alert ${a.severity.toLowerCase()}"><strong>[${a.severity}] ${a.rule.replaceAll("_", " ")}</strong><br>${escapeHtml(a.message)}</div>`).join("")
         : '<div class="alert info">No rule alerts were triggered for these inputs.</div>';
       resultNode.innerHTML = `
         <div class="result-top"><div><div class="subtle">Risk score</div><div class="score">${report.score}<span class="subtle"> / 100</span></div></div><span class="status ${actionClass}">${report.action}</span></div>
