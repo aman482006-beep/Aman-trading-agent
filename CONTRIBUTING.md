@@ -42,4 +42,4 @@ python -m compileall -q agent_lab app.py main.py
 
 Pull requests should receive maintainer review before merge. Reviewers should check correctness, tests, security, documentation accuracy, scope and attribution. CI provides automated checks; a green CI run is not a substitute for human review. Contributions affecting upstream code require an additional attribution/licence check.
 
-The repository currently has a small maintainer base. External contributors should allow time for review; please do not merge your own pull request solely because CI is green.
+The repository currently has a small maintainer base. External contributors should allow time for review; please do not merge your own pull request solely because CI is green. Administrators should configure the controls in [BRANCH_PROTECTION.md](BRANCH_PROTECTION.md) so the main branch requires passing CI and independent review.
