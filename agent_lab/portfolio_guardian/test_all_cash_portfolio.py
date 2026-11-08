@@ -1,4 +1,4 @@
-from risk_engine import Position, evaluate
+from agent_lab.portfolio_guardian.risk_engine import Position, evaluate
 
 
 def test_fully_cash_portfolio_has_no_investment_risk_alerts():
