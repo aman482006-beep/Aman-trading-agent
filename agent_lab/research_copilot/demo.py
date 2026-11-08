@@ -1,7 +1,7 @@
-from core import AgentState, run_research
+from agent_lab.research_copilot.core import AgentState, run_research
 
 
-if __name__ == "__main__":
+def main() -> None:
     state = AgentState(
         question="Is this company worth researching further?",
         ticker="DEMO",
@@ -16,15 +16,19 @@ if __name__ == "__main__":
     )
 
     result = run_research(state)
-    print("\n=== AGENT DECISION ===")
+    print("\n=== DETERMINISTIC DEMO DECISION ===")
     print(result.outputs["synthesis"])
     print("\n=== TRACE ===")
     for event in result.trace:
         print(event)
-    print("\n=== EVIDENCE LEDGER ===")
+    print("\n=== ILLUSTRATIVE EVIDENCE LEDGER ===")
     for item in result.evidence:
         print(f"[{item.confidence:.2f}] {item.agent}: {item.claim} <- {item.source}")
     if result.vetoes:
         print("\n=== VETOES ===")
         for veto in result.vetoes:
             print("-", veto)
+
+
+if __name__ == "__main__":
+    main()
