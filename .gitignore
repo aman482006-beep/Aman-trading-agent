@@ -147,8 +147,11 @@ activemq-data/
 # SageMath parsed files
 *.sage.py
 
-# Environments
+# Environments and secrets. Keep only committed example templates.
 .env
+.env.*
+!.env.example
+!.env.enterprise.example
 .envrc
 .venv
 env/
